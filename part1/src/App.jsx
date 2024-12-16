@@ -1,52 +1,75 @@
-import { useState } from 'react'
+import React, { useState } from 'react';
 
-const App = () => {
-  const anecdotes = [
-    'If it hurts, do it more often.',
-    'Adding manpower to a late software project makes it later!',
-    'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
-    'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
-    'Premature optimization is the root of all evil.',
-    'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.',
-    'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.',
-    'The only way to go fast, is to go well.'
-  ]
-  
-  const [selected, setSelected] = useState(0)
-  const [votes, setVotes] = useState(Array(anecdotes.length).fill(0))
+const Button = ({ text, onClickHandler }) => {
+  return <button onClick={onClickHandler}>{text}</button>;
+};
 
-  const getRandomAnecdote = () => {
-    const randomIndex = Math.floor(Math.random() * anecdotes.length)
-    setSelected(randomIndex)
+const StatisticLine = ({ text, value }) => {
+  return (<>
+  <tr>
+      <td>{text}</td>
+      <td>{value}</td>
+  </tr>
+  </>);
+};
+
+const Statistics = ({ good, neutral, bad, letBad}) => {
+  const total = good + neutral + bad;
+  const average = total ? (good - bad) / total : 0;
+  const positive = total ? (good / total) * 100 : 0;
+
+  if (total === 0) {
+    return (
+      <div>
+        <h1>Statistics</h1>
+        <p>No feedback given</p>
+      </div>
+    );
   }
-
-  const voteForAnecdote = () => {
-    const copy = [...votes]
-    copy[selected] += 1
-    setVotes(copy)
-  }
-
-  const getAnecdoteWithMostVotes = () => {
-    const maxVotes = Math.max(...votes)
-    const maxIndex = votes.indexOf(maxVotes)
-    return { anecdote: anecdotes[maxIndex], votes: maxVotes }
-  }
-
-  const mostVoted = getAnecdoteWithMostVotes()
 
   return (
     <div>
-      <h1>Anecdote of the day</h1>
-      {anecdotes[selected]}<br></br>
-      has {votes[selected]} votes<br></br>
-      <button onClick={voteForAnecdote}>vote</button>
-      <button onClick={getRandomAnecdote}>next anecdote</button>
-
-      <h2>Anecdote with most votes</h2>
-      {mostVoted.anecdote}<br></br>
-      has {mostVoted.votes} votes
+      <h1>statistics</h1>
+      <table>
+        <tbody>
+          <StatisticLine text="good" value={good} />
+          <StatisticLine text="neutral" value={neutral} />
+          <StatisticLine text="bad" value={bad} />
+          <StatisticLine text="total" value={total} />
+          <StatisticLine text="average" value={average.toFixed(1)} />
+          <StatisticLine text="positive" value={`${positive.toFixed(1)}%`} />
+          <StatisticLine text="letbad" value={letBad} />
+        </tbody>
+      </table>
     </div>
-  )
-}
+  );
+};
 
-export default App
+const App = () => {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+  let letBad = 0;
+
+  const handleGoodClick = () => setGood(good + 1);
+  const handleNeutralClick = () => setNeutral(neutral + 1);
+  const handleBadClick = () => setBad(bad + 1);
+  console.log("bad ", bad)
+  let handleLetBadClick = () => letBad + 1;
+  console.log("letBad ", letBad)
+
+  return (
+    <div>
+      <h1>give feedback</h1>
+      <div>
+        <Button text="good" onClickHandler={handleGoodClick} />
+        <Button text="neutral" onClickHandler={handleNeutralClick} />
+        <Button text="bad" onClickHandler={handleBadClick} />
+        <Button text="let bad" onClickHandler={handleLetBadClick}/>
+      </div>
+      <Statistics good={good} neutral={neutral} bad={bad} letBad={letBad} />
+    </div>
+  );
+};
+
+export default App;
