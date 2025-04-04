@@ -27,8 +27,30 @@ const App = () => {
   const handleAddPerson = (event) => {
     event.preventDefault();
 
-    if (persons.some((person) => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
+    const existingPerson = persons.find((person) => person.name === newName);
+
+    if (existingPerson) {
+      // If person exists, confirm if they want to replace the old number
+      const confirmReplace = window.confirm(
+        `${newName} is already added to the phonebook. Do you want to replace the old number with the new one?`
+      );
+
+      if (confirmReplace) {
+        // Use PUT method to update the phone number
+        const updatedPerson = { ...existingPerson, number: newNumber };
+
+        personService.update(existingPerson.id, updatedPerson)
+          .then(response => {
+            setPersons(persons.map(person => 
+              person.id === existingPerson.id ? response.data : person
+            ));
+            setNewName('');
+            setNewNumber('');
+          })
+          .catch(error => {
+            console.error('There was an error updating the phone number!', error);
+          });
+      }
       return;
     }
 
@@ -49,7 +71,8 @@ const App = () => {
   };
 
   const handleDeletePerson = (id) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this person?');
+    const personToDelete = persons.find(person => person.id === id);
+    const confirmDelete = window.confirm('Delete '+personToDelete.name+'?');
 
     if (confirmDelete) {
       personService.deletePerson(id)
