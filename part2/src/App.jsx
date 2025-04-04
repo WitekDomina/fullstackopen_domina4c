@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import personService from './personService';
 import Filter from './Filter';
 import PersonForm from './PersonForm';
 import Persons from './Persons';
@@ -11,13 +11,12 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then((response) => {
+    personService.getAll()
+      .then(response => {
         setPersons(response.data);
       })
-      .catch((error) => {
-        console.error('There was an error fetching the data!', error);
+      .catch(error => {
+        console.error('Error fetching data:', error);
       });
   }, []);
 
@@ -37,19 +36,33 @@ const App = () => {
     const newId = maxId + 1;
 
     const personObject = { name: newName, number: newNumber, id: newId };
-    axios
-      .post('http://localhost:3001/persons', personObject)
-      .then((response) => {
+
+    personService.create(personObject)
+      .then(response => {
         setPersons(persons.concat(response.data));
         setNewName('');
         setNewNumber('');
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('There was an error adding the person!', error);
       });
   };
 
-  const filteredPersons = persons.filter((person) =>
+  const handleDeletePerson = (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this person?');
+
+    if (confirmDelete) {
+      personService.deletePerson(id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== id));
+        })
+        .catch(error => {
+          console.error('There was an error deleting the person!', error);
+        });
+    }
+  };
+
+  const filteredPersons = persons.filter(person =>
     person.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -66,7 +79,7 @@ const App = () => {
         onSubmit={handleAddPerson}
       />
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} onDelete={handleDeletePerson} />
     </div>
   );
 };
