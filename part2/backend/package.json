@@ -236,7 +236,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build-frontend": "npm run build --prefix ../src && rm -rf dist && cp -r ../src/dist ./dist"
   },
   "repository": {
     "type": "git",
