@@ -47,6 +47,7 @@
     "delayed-stream": "^1.0.0",
     "doctrine": "^2.1.0",
     "dot-prop": "^9.0.0",
+    "dotenv": "^16.5.0",
     "dunder-proto": "^1.0.1",
     "es-abstract": "^1.23.9",
     "es-define-property": "^1.0.1",
@@ -247,6 +248,7 @@
   "license": "ISC",
   "keywords": [],
   "devDependencies": {
+    "@vitejs/plugin-react-swc": "^3.10.1",
     "nodemon": "^3.1.10"
   }
 }
